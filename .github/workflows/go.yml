@@ -26,8 +26,7 @@ jobs:
       run: go build -o span -v ./main.go
     
     - name: Release
-      uses: elgohr/Github-Release-Action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        args: New Release of Span
+        files: ./span
+        draft: true
