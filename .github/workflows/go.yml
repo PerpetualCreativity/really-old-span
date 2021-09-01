@@ -1,4 +1,4 @@
-name: Go
+name: build
 
 on:
   push:
@@ -9,7 +9,11 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
 
@@ -20,3 +24,10 @@ jobs:
 
     - name: Build
       run: go build -o span -v ./main.go
+    
+    - name: Release
+      uses: elgohr/Github-Release-Action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      with:
+        args: New Release of Span
