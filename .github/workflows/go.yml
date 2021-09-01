@@ -23,10 +23,10 @@ jobs:
         go-version: 1.17
 
     - name: Build
-      run: go build -o span -v ./main.go
+      run: go build -o span-${{ matrix.platform }} -v ./main.go
     
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ./span
+        files: ./span-${{ matrix.platform }}
         draft: true
