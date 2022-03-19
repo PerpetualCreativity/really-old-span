@@ -24,10 +24,13 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"github.com/spf13/cobra"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/PerpetualCreativity/fancyChecks"
 )
+
+var fc = fancyChecks.New("", "", "Status: ", "Error: ")
 
 var cfgFile string
 var output string
@@ -47,7 +50,7 @@ concurrently (you can disable this) for speed.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+	fc.ErrCheck(rootCmd.Execute(), "command failed to execute")
 }
 
 func init() {

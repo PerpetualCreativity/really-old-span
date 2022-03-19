@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"errors"
-	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -55,28 +53,22 @@ If folder is not specified, the default is the current folder.`,
 			inputFolder = args[0]
 		}
 		// check if input folder exists
-		if _, err := os.Stat(inputFolder); err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				fmt.Printf("input folder not found: %s does not exist", inputFolder)
-			} else {
-				fmt.Println(err)
-			}
-			return
-		}
+		_, err := os.Stat(inputFolder)
+		fc.ErrCheck(err, "folder doesn't exist or is not accessible")
+
 		configFileUsed, err := filepath.Rel(".", viper.ConfigFileUsed())
-		cobra.CheckErr(err)
+		fc.ErrCheck(err, "config file not found")
 
 		outputFolder = viper.GetString("output")
 		inputFolder = filepath.Clean(inputFolder)
 
 		rawPrograms := viper.Get("programs")
 
-		if rawP, ok := rawPrograms.([]interface{}); !ok {
-			fmt.Println("programs must be a YAML list.")
-		} else {
-			for _, smss := range rawP {
-				programs = append(programs, cast.ToStringMapStringSlice(smss))
-			}
+		rawP, ok := rawPrograms.([]interface{})
+		fc.ErrNComp(ok, false, "programs must be a YAML list.")
+
+		for _, smss := range rawP {
+			programs = append(programs, cast.ToStringMapStringSlice(smss))
 		}
 
 		os.RemoveAll(outputFolder)
@@ -100,16 +92,14 @@ If folder is not specified, the default is the current folder.`,
 			fileRun(done, path, info)
 			return nil
 		})
-		cobra.CheckErr(err)
+		fc.ErrCheck(err, "Error while walking through folder.")
 
 		// only return after all goroutines we started (in fileRun) finish
-		fmt.Printf("There were a total of %d child goroutines spawned.\n", len(finish))
-		for i, done := range finish {
+		for _, done := range finish {
 			<- done
 			close(done)
-			fmt.Printf("Goroutine %d has finished.\n", i)
 		}
-		fmt.Println("All programs completed.")
+		fc.Success("All programs completed.")
 	},
 }
 
@@ -151,23 +141,22 @@ func fileRun(done chan<- bool, path string, fileInfo fs.DirEntry) {
 			os.Mkdir(outputPath, 0755)
 		} else {
 			contents, err := os.ReadFile(path)
-			cobra.CheckErr(err)
+			fc.ErrCheck(err, "failed to read folder")
 			for _, program := range programs[index]["commands"] {
 				programArgs := strings.Split(program, " ")
 				p := exec.Command(programArgs[0], append(programArgs[1:], path)...)
-				fmt.Println(programArgs[0], append(programArgs[1:], path))
 				pIn, _ := p.StdinPipe()
 				pOut, _ := p.StdoutPipe()
 				p.Start()
 				pIn.Close()
 				pByteOut, err := ioutil.ReadAll(pOut)
-				cobra.CheckErr(err)
+				fc.ErrCheck(err, "failed to run program"+program)
 				p.Wait()
 				contents = pByteOut
 			}
 			// 0644 for files
 			err = os.WriteFile(outputPath, contents, 0644)
-			cobra.CheckErr(err)
+			fc.ErrCheck(err, "failed to write to file")
 		}
 		done <- true
 	}()

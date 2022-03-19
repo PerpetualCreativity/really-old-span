@@ -22,7 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"github.com/spf13/cobra"
@@ -53,8 +52,8 @@ programs:
     outputExt: .css
 # name of folder to output
 output: output`)), 0644)
-		cobra.CheckErr(err)
-		fmt.Println("Successfully created sample configuration file.")
+		fc.ErrCheck(err, "Failed to write to file.")
+		fc.Neutral("Successfully created sample configuration file.")
 	},
 }
 
