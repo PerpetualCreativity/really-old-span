@@ -30,7 +30,7 @@ import (
 	"github.com/PerpetualCreativity/fancyChecks"
 )
 
-var fc = fancyChecks.New("", "", "Status: ", "Error: ")
+var fc = fancyChecks.New("", "", "Status", "Error")
 
 var cfgFile string
 var output string
