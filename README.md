@@ -1,3 +1,5 @@
+# **NB: this version of `span` is now deprecated. Please use this version instead: [PerpetualCreativity/span](https://github.com/PerpetualCreativity/span)**
+
 # `span`
 
 `span` is an easy-to-use static site generator that lets you use the command-line tools you want to use. Each file is processed concurrently.

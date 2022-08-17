@@ -1,4 +1,4 @@
-module span
+module github.com/PerpetualCreativity/old-span
 
 go 1.16
 

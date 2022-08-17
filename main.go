@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "span/cmd"
+import "github.com/PerpetualCreativity/old-span/cmd"
 
 func main() {
 	cmd.Execute()
